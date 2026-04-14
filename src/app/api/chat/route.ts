@@ -144,8 +144,8 @@ export async function POST(req: NextRequest) {
           ];
 
           const summaryResponse = await openai.chat.completions.create({
-            model: "gpt-4o",
-            max_tokens: 512,
+            model: "gpt-5.4-2026-03-05",
+            max_completion_tokens: 512,
             messages: continuedMessages,
             tools: appraisalTools,
           });
@@ -212,8 +212,8 @@ export async function POST(req: NextRequest) {
             ];
 
             const finalResponse = await openai.chat.completions.create({
-              model: "gpt-4o",
-              max_tokens: 512,
+              model: "gpt-5.4-2026-03-05",
+              max_completion_tokens: 512,
               messages: finalMessages,
             });
 
@@ -252,13 +252,13 @@ export async function POST(req: NextRequest) {
               : []),
             {
               role: "system" as const,
-              content: `You MUST call calculate_appraisal RIGHT NOW. Metal: ${currentAppraisal?.metalType || "GOLD"}, Category: ${currentAppraisal?.itemCategory || "ring"}. Use default estimates for any missing values. Do not respond with text — only call the tool.`,
+              content: `You MUST call calculate_appraisal RIGHT NOW. Metal: ${currentAppraisal?.metalType || "GOLD"}, Category: ${currentAppraisal?.itemCategory || "ring"}, Estimated weight: ${currentAppraisal?.estimatedWeight || 5}g, Purity: ${currentAppraisal?.karatPurity ? currentAppraisal.karatPurity + "K" : "assume 14K (0.583)"}. Use these values. Do not respond with text — only call the tool.`,
             },
           ];
 
           const forceResponse = await openai.chat.completions.create({
-            model: "gpt-4o",
-            max_tokens: 512,
+            model: "gpt-5.4-2026-03-05",
+            max_completion_tokens: 512,
             messages: forceMessages,
             tools: appraisalTools,
             tool_choice: {
@@ -306,8 +306,8 @@ export async function POST(req: NextRequest) {
             ];
 
             const summaryRes = await openai.chat.completions.create({
-              model: "gpt-4o",
-              max_tokens: 256,
+              model: "gpt-5.4-2026-03-05",
+              max_completion_tokens: 256,
               messages: summaryMsgs,
             });
 

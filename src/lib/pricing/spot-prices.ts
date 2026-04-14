@@ -4,7 +4,9 @@ import { db } from "@/lib/db";
 
 let cachedPrices: SpotPrices | null = null;
 let cacheTimestamp = 0;
-const CACHE_TTL = 5 * 60 * 1000; // 5 minutes
+// Cache for 2 hours 40 min → ~9 fetches/day → 27 API calls/day → ~810/month
+// GoldAPI free tier allows 300 requests/month, so this stays well under
+const CACHE_TTL = 2 * 60 * 60 * 1000 + 40 * 60 * 1000; // 2h 40m
 
 // Fallback prices (updated periodically as a safety net)
 const FALLBACK_PRICES: SpotPrices = {
@@ -96,8 +98,8 @@ async function loadFromDb(): Promise<SpotPrices | null> {
     }
 
     if (results.gold && results.silver && results.platinum && latestDate) {
-      // Don't use DB cache older than 1 hour
-      if (Date.now() - latestDate.getTime() > 60 * 60 * 1000) return null;
+      // Don't use DB cache older than 6 hours
+      if (Date.now() - latestDate.getTime() > 6 * 60 * 60 * 1000) return null;
 
       return {
         gold: results.gold,

@@ -104,9 +104,20 @@ export const appraisalTools: OpenAI.Chat.Completions.ChatCompletionTool[] = [
             description:
               "Purity as a decimal. E.g., 14K gold = 0.583, sterling silver = 0.925",
           },
-          weightGrams: {
+          weightGramsLow: {
             type: "number",
-            description: "Total item weight in grams",
+            description:
+              "Low-end weight estimate in grams (from the default table or reference-object-calibrated estimate)",
+          },
+          weightGramsBest: {
+            type: "number",
+            description:
+              "Best/most-likely weight estimate in grams",
+          },
+          weightGramsHigh: {
+            type: "number",
+            description:
+              "High-end weight estimate in grams (from the default table or reference-object-calibrated estimate)",
           },
           confidenceLevel: {
             type: "string",
@@ -121,9 +132,73 @@ export const appraisalTools: OpenAI.Chat.Completions.ChatCompletionTool[] = [
         required: [
           "metalType",
           "purityFraction",
-          "weightGrams",
+          "weightGramsBest",
           "confidenceLevel",
         ],
+      },
+    },
+  },
+  {
+    type: "function",
+    function: {
+      name: "detect_gemstones",
+      description:
+        "Record any gemstones visible in the jewelry. Call this when you see diamonds, colored stones, or other gems. Use conservative estimates — assume lab-grown diamond pricing. Do NOT try to definitively identify colored gemstone types.",
+      parameters: {
+        type: "object",
+        properties: {
+          gemstones: {
+            type: "array",
+            items: {
+              type: "object",
+              properties: {
+                type: {
+                  type: "string",
+                  enum: ["diamond", "colored_stone", "unknown"],
+                  description:
+                    "Use 'diamond' only if clearly a diamond. Use 'colored_stone' for rubies, sapphires, emeralds, etc. (do NOT try to identify specific type). Use 'unknown' if unsure.",
+                },
+                estimatedCaratSize: {
+                  type: "number",
+                  description:
+                    "Estimated carat size of the stone. Use reference: 0.25ct≈4mm, 0.5ct≈5mm, 1ct≈6.5mm, 2ct≈8mm for round cuts.",
+                },
+                count: {
+                  type: "number",
+                  description: "Number of similar stones visible",
+                },
+                color: {
+                  type: "string",
+                  description:
+                    "Observed color: 'colorless', 'near-colorless', 'light yellow', 'red', 'blue', 'green', etc.",
+                },
+                cut: {
+                  type: "string",
+                  description:
+                    "Cut shape if identifiable: 'round', 'princess', 'oval', 'emerald', 'cushion', 'pear', 'marquise', 'unknown'",
+                },
+                confidence: {
+                  type: "string",
+                  enum: ["likely", "possible", "uncertain"],
+                  description:
+                    "How confident you are in the stone identification. 'likely' = clear visual indicators. 'possible' = some indicators. 'uncertain' = could be glass/CZ/simulant.",
+                },
+                notes: {
+                  type: "string",
+                  description:
+                    "Any caveats: 'could be CZ', 'may be synthetic', 'appears cloudy', etc.",
+                },
+              },
+              required: [
+                "type",
+                "estimatedCaratSize",
+                "count",
+                "confidence",
+              ],
+            },
+          },
+        },
+        required: ["gemstones"],
       },
     },
   },

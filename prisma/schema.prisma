@@ -90,13 +90,15 @@ model Appraisal {
   status AppraisalStatus @default(DRAFT)
 
   // AI analysis results (populated incrementally)
-  metalType       MetalType?
-  karatPurity     Float?
-  estimatedWeight Float?
-  weightSource    String?
-  description     String?
-  aiConfidence    Float?
-  itemCategory    String?
+  metalType          MetalType?
+  karatPurity        Float?
+  estimatedWeight    Float?
+  estimatedWeightLow  Float?
+  estimatedWeightHigh Float?
+  weightSource       String?
+  description        String?
+  aiConfidence       Float?
+  itemCategory       String?
 
   // Pricing snapshot (frozen at appraisal time)
   spotPricePerGram    Float?
@@ -128,6 +130,7 @@ model AppraisalImage {
   url         String
   key         String
   order       Int      @default(0)
+  imageType   String?  // "overview", "scale_reference", "stamp_closeup"
   createdAt   DateTime @default(now())
 
   appraisal Appraisal @relation(fields: [appraisalId], references: [id], onDelete: Cascade)

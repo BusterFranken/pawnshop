@@ -106,7 +106,11 @@ export function AppraisalCard({ appraisal }: AppraisalCardProps) {
                 <Scale className="h-4 w-4 text-muted-foreground" />
                 <span className="text-muted-foreground">Weight:</span>
                 <span className="font-medium">
-                  {formatWeight(appraisal.estimatedWeight)}
+                  {(appraisal as Record<string, unknown>).estimatedWeightLow &&
+                   (appraisal as Record<string, unknown>).estimatedWeightHigh &&
+                   (appraisal as Record<string, unknown>).estimatedWeightLow !== (appraisal as Record<string, unknown>).estimatedWeightHigh
+                    ? `${formatWeight((appraisal as Record<string, unknown>).estimatedWeightLow as number)}-${formatWeight((appraisal as Record<string, unknown>).estimatedWeightHigh as number)}`
+                    : formatWeight(appraisal.estimatedWeight)}
                 </span>
                 {appraisal.weightSource && (
                   <span className="text-xs text-muted-foreground">

@@ -24,7 +24,9 @@ export function calculateAppraisal(
   input: {
     metalType: string;
     purityFraction: number;
-    weightGrams: number;
+    weightGramsLow?: number;
+    weightGramsBest: number;
+    weightGramsHigh?: number;
     confidenceLevel: "high" | "medium" | "low";
     notes?: string;
   },
@@ -32,17 +34,25 @@ export function calculateAppraisal(
 ): AppraisalResult {
   const metalKey = input.metalType.toLowerCase() as MetalKey;
   const spotPricePerGram = spotPrices[metalKey]?.perGram || 0;
-  const pureMetalWeight = input.weightGrams * input.purityFraction;
-  const meltValue = pureMetalWeight * spotPricePerGram;
-
   const factors = PAYOUT_FACTORS[input.confidenceLevel];
 
+  const wLow = input.weightGramsLow ?? input.weightGramsBest;
+  const wBest = input.weightGramsBest;
+  const wHigh = input.weightGramsHigh ?? input.weightGramsBest;
+
+  const pureWeightBest = wBest * input.purityFraction;
+  const meltValueBest = pureWeightBest * spotPricePerGram;
+
+  // Low payout uses low weight × low factor, high uses high weight × high factor
+  const meltValueLow = wLow * input.purityFraction * spotPricePerGram;
+  const meltValueHigh = wHigh * input.purityFraction * spotPricePerGram;
+
   return {
-    pureMetalWeightGrams: round(pureMetalWeight, 2),
+    pureMetalWeightGrams: round(pureWeightBest, 2),
     spotPricePerGram: round(spotPricePerGram, 2),
-    meltValue: round(meltValue, 2),
-    estimatedPayoutLow: round(meltValue * factors.low, 2),
-    estimatedPayoutHigh: round(meltValue * factors.high, 2),
+    meltValue: round(meltValueBest, 2),
+    estimatedPayoutLow: round(meltValueLow * factors.low, 2),
+    estimatedPayoutHigh: round(meltValueHigh * factors.high, 2),
     confidenceLevel: input.confidenceLevel,
     disclaimer: buildDisclaimer(input.confidenceLevel),
     calculatedAt: new Date(),
