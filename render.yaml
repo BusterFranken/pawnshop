@@ -23,7 +23,7 @@ services:
     # migrations are incomplete/drifted from schema.prisma. db push syncs the DB
     # directly to the schema. Safe here because the DB is fresh. Revisit with
     # proper migrations before there is real production data.
-    buildCommand: npm ci && npx prisma generate && npx prisma db push --skip-generate --accept-data-loss && npx prisma db seed && npm run build
+    buildCommand: npm ci && npx prisma generate && npx prisma db push --skip-generate --accept-data-loss && npm run build
     startCommand: npx next start -p $PORT
     envVars:
       # --- Wired automatically by Render ---
