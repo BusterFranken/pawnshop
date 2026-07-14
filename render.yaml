@@ -1,0 +1,58 @@
+# Render Blueprint — deploys the Pawnshop Next.js app + a PostgreSQL database.
+# Docs: https://render.com/docs/blueprint-spec
+#
+# Secret values (API keys) are intentionally NOT in this file. They are marked
+# `sync: false`, which tells Render to prompt for them in the dashboard so they
+# are never committed to git. Copy them from your local .env.local.
+
+databases:
+  - name: pawnshop-db
+    plan: free
+    region: oregon
+    databaseName: pawnshop
+    user: pawnshop
+
+services:
+  - type: web
+    name: pawnshop
+    runtime: node
+    plan: free
+    region: oregon
+    branch: main
+    buildCommand: npm ci && npx prisma generate && npx prisma migrate deploy && npm run build
+    startCommand: npx next start -p $PORT
+    envVars:
+      # --- Wired automatically by Render ---
+      - key: DATABASE_URL
+        fromDatabase:
+          name: pawnshop-db
+          property: connectionString
+      - key: AUTH_SECRET
+        generateValue: true # Render generates a strong random secret
+      - key: AUTH_TRUST_HOST
+        value: "true" # let Auth.js trust the Render host/proxy
+      - key: NODE_VERSION
+        value: "22"
+      # --- You paste these in the dashboard (copied from .env.local) ---
+      - key: OPENAI_API_KEY
+        sync: false
+      - key: ANTHROPIC_API_KEY
+        sync: false
+      - key: S3_BUCKET
+        sync: false
+      - key: S3_REGION
+        sync: false
+      - key: S3_ACCESS_KEY_ID
+        sync: false
+      - key: S3_SECRET_ACCESS_KEY
+        sync: false
+      - key: S3_ENDPOINT
+        sync: false
+      - key: GOLDAPI_KEY
+        sync: false
+      - key: AUTH_GOOGLE_ID
+        sync: false
+      - key: AUTH_GOOGLE_SECRET
+        sync: false
+      - key: NEXT_PUBLIC_MAPBOX_TOKEN
+        sync: false
